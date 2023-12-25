@@ -1,9 +1,12 @@
-import {render, fireEvent} from '@testing-library/react-native';
+import {render, fireEvent, waitFor} from '@testing-library/react-native';
 import renderer from 'react-test-renderer';
 import {Provider} from 'react-redux';
 import configureStore from 'redux-mock-store';
 import SignUpScreen from '../src/screens/signup/Signup';
 import {addUser} from '../src/store/slices/authSlice';
+import axios from 'axios';
+
+jest.mock('axios');
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn(),
@@ -95,7 +98,16 @@ describe('SignupScreen component', () => {
     consoleSpy.mockRestore();
   });
 
-  it('executes signup function on button press with new credentials', () => {
+  it('executes signup function on button press with new credentials', async () => {
+    const mockedEmail = 'test@example.com';
+    const mockedPassword = 'password';
+
+    axios.post.mockResolvedValue({
+      data: {email: 'test@example.com', password: 'password'},
+    });
+
+    // axios.post.mockRejectedValue(new Error('Request failed'));
+
     const {getByTestId} = render(
       <Provider store={store}>
         <SignUpScreen />
@@ -106,14 +118,21 @@ describe('SignupScreen component', () => {
     const passwordInput = getByTestId('passwordInputField');
     const signupButton = getByTestId('signupButton');
 
-    fireEvent.changeText(emailInput, 'test@example.com');
-    fireEvent.changeText(passwordInput, 'password');
+    fireEvent.changeText(emailInput, mockedEmail);
+    fireEvent.changeText(passwordInput, mockedPassword);
     fireEvent.press(signupButton);
+
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        'https://jsonplaceholder.typicode.com/posts',
+        {email: mockedEmail.toLowerCase(), password: mockedPassword},
+      );
+    });
 
     const actions = store.getActions();
     const expectedAction = addUser({
-      email: 'test@example.com',
-      password: 'password',
+      email: mockedEmail,
+      password: mockedPassword,
     });
 
     expect(actions).toContainEqual(expectedAction);

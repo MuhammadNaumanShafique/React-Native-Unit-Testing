@@ -22,7 +22,6 @@ const SignUpScreen = () => {
   const users = useSelector(state => state.auth.users);
 
   const signUpUser = () => {
-    console.log('Signup pressed');
     if (email.length > 0 && password.length > 0) {
       let user = users.find(user => user.email === email.toLowerCase());
       if (!user) {
@@ -32,13 +31,15 @@ const SignUpScreen = () => {
             password: password,
           })
           .then(function (response) {
-            console.log('Login response: ', response);
-            dispatch(addUser({email: email.toLowerCase(), password: password}));
+            dispatch(
+              addUser({
+                email: response.data.email,
+                password: response.data.password,
+              }),
+            );
             navigation.navigate('loginScreen');
           })
-          .catch(function (error) {
-            console.log(error);
-          });
+          .catch(function (error) {});
       } else {
         console.log('User already exists try sign in');
       }
