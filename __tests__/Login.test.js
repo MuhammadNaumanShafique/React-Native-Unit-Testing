@@ -99,6 +99,28 @@ describe('LoginScreen component', () => {
     alertSpy.mockRestore();
   });
 
+  it('executes loginUser function on button press with wrong password', () => {
+    const {getByText, getByPlaceholderText} = render(
+      <Provider store={store}>
+        <LoginScreen />
+      </Provider>,
+    );
+    const loginButton = getByText('Login');
+
+    const emailInput = getByPlaceholderText('Enter your email');
+    const passwordInput = getByPlaceholderText('Password');
+
+    fireEvent.changeText(emailInput, 'nauman@gmail.com');
+    fireEvent.changeText(passwordInput, 'password1234');
+
+    expect(emailInput.props.value).toBe('nauman@gmail.com');
+    expect(passwordInput.props.value).toBe('password1234');
+
+    fireEvent.press(loginButton);
+
+    expect(getByText('Invalid password')).toBeTruthy();
+  });
+
   it('executes loginUser function on button press with valid credentials', () => {
     const {getByText, getByPlaceholderText} = render(
       <Provider store={store}>

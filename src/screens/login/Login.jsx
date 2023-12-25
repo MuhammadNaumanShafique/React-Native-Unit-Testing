@@ -15,19 +15,21 @@ import {useSelector} from 'react-redux';
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const navigation = useNavigation();
 
   const users = useSelector(state => state.auth.users);
 
   const loginUser = () => {
+    setErrorMessage(null);
     if (email.length > 0 && password.length > 0) {
       let user = users.find(user => user.email === email.toLowerCase());
       if (user) {
         if (user.password === password) {
           navigation.navigate('homeScreen');
         } else {
-          console.log('Invalid password');
+          setErrorMessage('Invalid password');
         }
       } else {
         Alert.alert('User does not exists, signup first');
@@ -45,6 +47,7 @@ const LoginScreen = () => {
           value={email}
           onChangeText={value => setEmail(value)}
         />
+        {errorMessage && <Text style={styles.errorStyle}>{errorMessage}</Text>}
         <TextInput
           testID="passwordInputField"
           style={styles.inputFieldStyle}
@@ -89,4 +92,5 @@ const styles = StyleSheet.create({
   },
   signUpView: {marginTop: 20, flexDirection: 'row'},
   signInButton: {color: 'blue'},
+  errorStyle: {color: 'red', width: '100%', marginTop: -20, marginBottom: 20},
 });
