@@ -3,6 +3,7 @@ import renderer from 'react-test-renderer';
 import LoginScreen from '../src/screens/login/Login';
 import {Provider} from 'react-redux';
 import configureStore from 'redux-mock-store';
+import {Alert} from 'react-native';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn(),
@@ -80,7 +81,7 @@ describe('LoginScreen component', () => {
       </Provider>,
     );
     const loginButton = getByText('Login');
-    const consoleSpy = jest.spyOn(console, 'log');
+    const alertSpy = jest.spyOn(Alert, 'alert');
 
     const emailInput = getByPlaceholderText('Enter your email');
     const passwordInput = getByPlaceholderText('Password');
@@ -93,17 +94,9 @@ describe('LoginScreen component', () => {
 
     fireEvent.press(loginButton);
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'User does not exists, signup first',
-    );
+    expect(alertSpy).toHaveBeenCalledWith('User does not exists, signup first');
 
-    // expect(store.getActions()).toContainEqual({
-    //   type: 'LOGIN',
-    //   payload: {email: 'testuser', password: 'password123'},
-    // });
-    // expect(consoleSpy).toHaveBeenCalledWith('User logged in successfully');
-
-    consoleSpy.mockRestore();
+    alertSpy.mockRestore();
   });
 
   it('executes loginUser function on button press with valid credentials', () => {
@@ -125,11 +118,6 @@ describe('LoginScreen component', () => {
     expect(passwordInput.props.value).toBe('password123');
 
     fireEvent.press(loginButton);
-
-    // expect(store.getActions()).toContainEqual({
-    //   type: 'LOGIN',
-    //   payload: {email: 'nauman@gmail.com', password: 'password123'},
-    // });
 
     expect(mockNavigate).toHaveBeenCalledWith('homeScreen');
 

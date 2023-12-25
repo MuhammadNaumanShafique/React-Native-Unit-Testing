@@ -1,6 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
+  Alert,
   Button,
   SafeAreaView,
   StyleSheet,
@@ -29,7 +30,7 @@ const LoginScreen = () => {
           console.log('Invalid password');
         }
       } else {
-        console.log('User does not exists, signup first');
+        Alert.alert('User does not exists, signup first');
       }
     }
   };
